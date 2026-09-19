@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Mock Interview — PlacementAI{% endblock %}
+{% block content %}
+<section class="app-page narrow"><div class="page-head"><div><span class="eyebrow">AI MOCK INTERVIEW</span><h1>Practice before the real interview.</h1><p>Answer each question out loud or type your answer. Use the model answers as a study guide.</p></div><button class="solid-btn" onclick="startInterview()">Start session</button></div>
+<div class="interview-wrap">{% for item in questions %}<div class="question-card" data-index="{{ loop.index0 }}"><div class="q-top"><span>QUESTION {{ "%02d"|format(loop.index) }}</span><b>{{ item.type }}</b></div><h2>{{ item.q }}</h2><textarea placeholder="Write your answer here..."></textarea><div class="answer-tools"><button class="outline-btn" onclick="showHint(this)">Show structure</button><span class="hint">Try: Situation → Action → Result → Learning</span></div></div>{% endfor %}</div>
+<div class="interview-footer"><button class="solid-btn" onclick="scoreInterview()">Finish interview</button><div id="interviewResult"></div></div></section>
+{% endblock %}

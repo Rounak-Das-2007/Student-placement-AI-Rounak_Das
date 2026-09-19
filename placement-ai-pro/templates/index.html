@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}PlacementAI — Your AI Placement Coach{% endblock %}
+{% block content %}
+<section class="hero-new">
+<div class="hero-grid">
+<div class="hero-copy">
+<div class="eyebrow"><span class="live-dot"></span> AI-POWERED PLACEMENT PLATFORM</div>
+<h1>Turn your skills into your <span>dream placement.</span></h1>
+<p class="hero-lead">One intelligent workspace to measure your readiness, fix skill gaps, practice interviews, improve your resume and discover matching jobs.</p>
+<div class="hero-actions"><a class="solid-btn xl" href="{{ url_for('register') }}">Build My Placement Profile <b>→</b></a><a class="text-btn" href="#features">See how it works ↓</a></div>
+<div class="hero-proof"><div><strong>6+</strong><span>Career tools</span></div><i></i><div><strong>100</strong><span>Readiness score</span></div><i></i><div><strong>24/7</strong><span>AI guidance</span></div></div>
+</div>
+<div class="hero-visual">
+<div class="orb orb-one"></div><div class="orb orb-two"></div>
+<div class="dash-card">
+<div class="dash-head"><div><span class="muted">YOUR READINESS</span><h3>Placement Score</h3></div><span class="status-pill">● On Track</span></div>
+<div class="score-row"><div class="big-score">78<small>/100</small></div><div class="mini-ring"><b>78%</b></div></div>
+<div class="meter"><div style="width:78%"></div></div>
+<div class="dash-grid"><div><span>Technical</span><b>82%</b></div><div><span>Resume</span><b>84%</b></div><div><span>Interview</span><b>69%</b></div></div>
+<div class="ai-card"><span class="ai-spark">✦</span><div><b>AI next step</b><p>Practice DSA for 30 min today.</p></div><span class="arrow">↗</span></div>
+</div>
+<div class="float-card float-left"><span class="float-icon purple-bg">✓</span><div><b>Resume analyzed</b><small>ATS score 84%</small></div></div>
+<div class="float-card float-right"><span class="float-icon green-bg">↗</span><div><b>+12% growth</b><small>This month</small></div></div>
+</div>
+</div>
+</section>
+<section class="trusted"><span>DESIGNED FOR PLACEMENT SEASON</span><div><b>DSA</b><b>DBMS</b><b>JAVA</b><b>SQL</b><b>APTITUDE</b><b>HR</b></div></section>
+<section class="feature-section" id="features">
+<div class="section-intro"><span class="eyebrow">YOUR PLACEMENT OS</span><h2>Everything in one place.<br><span>Nothing scattered.</span></h2><p>Stop jumping between notes, resume websites, interview videos and job portals. Build your entire placement strategy here.</p></div>
+<div class="feature-showcase">
+<a class="product-card featured-card" href="{{ url_for('assessment') }}"><div class="card-top"><span class="icon-box violet">◎</span><span class="card-link">Open tool ↗</span></div><h3>Placement Readiness</h3><p>Get a data-driven score from your academics, technical skills, projects, internships and communication.</p><div class="fake-score"><strong>78</strong><span>/100 readiness</span></div><div class="tiny-bars"><i style="width:90%"></i><i style="width:72%"></i><i style="width:55%"></i></div></a>
+<a class="product-card" href="{{ url_for('resume') }}"><div class="card-top"><span class="icon-box blue">▤</span><span class="card-link">Analyze ↗</span></div><h3>Resume AI</h3><p>Check keywords, technical skills and placement-focused content.</p><div class="metric"><strong>84</strong><span>ATS readiness</span></div></a>
+<a class="product-card" href="{{ url_for('interview') }}"><div class="card-top"><span class="icon-box green">◉</span><span class="card-link">Practice ↗</span></div><h3>AI Interview</h3><p>Practice HR, DSA, SQL and technical questions with instant feedback.</p><div class="metric"><strong>15</strong><span>questions/session</span></div></a>
+<a class="product-card" href="{{ url_for('jobs') }}"><div class="card-top"><span class="icon-box orange">⌁</span><span class="card-link">Explore ↗</span></div><h3>Job Matcher</h3><p>Find roles based on your current skills and readiness profile.</p><div class="metric"><strong>12</strong><span>good matches</span></div></a>
+<a class="product-card" href="{{ url_for('roadmap') }}"><div class="card-top"><span class="icon-box pink">◇</span><span class="card-link">Plan ↗</span></div><h3>AI Roadmap</h3><p>A weekly preparation plan focused on your weakest areas.</p><div class="metric"><strong>30</strong><span>days mapped</span></div></a>
+</div>
+</section>
+<section class="split-section">
+<div class="split-copy"><span class="eyebrow">FROM DATA TO ACTION</span><h2>Your score is not the goal.<br><span>Your improvement is.</span></h2><p>PlacementAI converts your assessment into a simple priority list so you always know what to study next.</p><div class="check-list"><div>✓ Finds your biggest skill gap</div><div>✓ Prioritizes high-impact preparation</div><div>✓ Tracks your progress over time</div></div><a class="solid-btn" href="{{ url_for('assessment') }}">Take the assessment →</a></div>
+<div class="priority-card"><div class="priority-head"><div><span class="muted">AI PRIORITY BOARD</span><h3>What should I do today?</h3></div><span class="three-dot">•••</span></div><div class="priority-item high"><span class="priority-num">01</span><div><b>Practice DSA</b><small>Arrays & strings · 30 min</small></div><span class="tag red">HIGH</span></div><div class="priority-item"><span class="priority-num">02</span><div><b>Revise SQL JOINs</b><small>DBMS · 20 min</small></div><span class="tag amber">MED</span></div><div class="priority-item"><span class="priority-num">03</span><div><b>Mock HR answer</b><small>Communication · 15 min</small></div><span class="tag green">LOW</span></div><div class="weekly"><div><b>Weekly progress</b><span>+12%</span></div><div class="meter"><div style="width:72%"></div></div></div></div>
+</section>
+<section class="cta-band"><div><span class="eyebrow">READY WHEN YOU ARE</span><h2>Know your position.<br>Build your advantage.</h2></div><a class="white-btn" href="{{ url_for('register') }}">Start for free →</a></section>
+{% endblock %}

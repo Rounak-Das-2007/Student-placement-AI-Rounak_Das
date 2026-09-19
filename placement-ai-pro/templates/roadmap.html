@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block title %}Interactive 30-Day Roadmap — PlacementAI{% endblock %}
+{% block content %}
+<section class="app-page narrow">
+  <div class="page-head">
+    <div>
+      <span class="eyebrow">30-DAY PLACEMENT ROADMAP</span>
+      <h1>Your structured path from preparation to offer.</h1>
+      <p>Click any milestone to mark it completed. Your progress updates in real-time and persists across sessions.</p>
+    </div>
+  </div>
+
+  <!-- Dynamic Roadmap Progress Card -->
+  <div class="roadmap-summary-card">
+    <div class="summary-top">
+      <div>
+        <span class="muted">OVERALL COMPLETION</span>
+        <div class="summary-numbers">
+          <strong id="roadmapPctDisplay">{{ roadmap.percentage }}%</strong>
+          <span id="roadmapCountDisplay">{{ roadmap.completed_count }} of {{ roadmap.total_tasks }} milestones done</span>
+        </div>
+      </div>
+      <div class="summary-status-badge" id="roadmapStatusBadge">
+        {% if roadmap.percentage >= 80 %}
+        <span class="badge-pill green-pill">🚀 Drive Ready</span>
+        {% elif roadmap.percentage >= 40 %}
+        <span class="badge-pill purple-pill">⚡ Strong Momentum</span>
+        {% else %}
+        <span class="badge-pill blue-pill">🌱 Foundation Phase</span>
+        {% endif %}
+      </div>
+    </div>
+    <div class="meter large-meter">
+      <div id="roadmapProgressBar" style="width: {{ roadmap.percentage }}%"></div>
+    </div>
+  </div>
+
+  <!-- Filter Pills & Accordion Controls -->
+  <div class="roadmap-filters" style="justify-content: space-between; align-items: center;">
+    <div style="display: flex; gap: 6px;">
+      <button class="filter-pill active" onclick="filterRoadmap('all', this)">
+        All Milestones <span class="pill-count" id="filterCountAll">{{ roadmap.total_tasks }}</span>
+      </button>
+      <button class="filter-pill" onclick="filterRoadmap('pending', this)">
+        Pending <span class="pill-count" id="filterCountPending">{{ roadmap.total_tasks - roadmap.completed_count }}</span>
+      </button>
+      <button class="filter-pill" onclick="filterRoadmap('completed', this)">
+        Completed <span class="pill-count" id="filterCountCompleted">{{ roadmap.completed_count }}</span>
+      </button>
+    </div>
+    <button class="text-btn small" id="toggleAllWeeksBtn" onclick="toggleAllWeeks()">Collapse All Weeks ▾</button>
+  </div>
+
+  <!-- Week by Week Checklist (Accordion) -->
+  <div class="roadmap-weeks-wrap">
+    {% for week in roadmap.weeks %}
+    <div class="week-card" data-week-id="{{ week.id }}">
+      <div class="week-header" onclick="toggleWeekCard(this)">
+        <div class="week-title-area">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="week-num-badge">WEEK {{ week.num }}</span>
+            <span class="week-chevron" style="font-size: 11px; color: #94a3b8; transition: transform 0.2s;">▼</span>
+          </div>
+          <h2>{{ week.icon }} {{ week.title }}</h2>
+          <p>{{ week.desc }}</p>
+        </div>
+        <div class="week-stat-pill">
+          <span class="week-fraction" id="fraction-{{ week.id }}">{{ week.completed_count }}/{{ week.total_count }} Done</span>
+          <div class="week-mini-bar">
+            <div id="bar-{{ week.id }}" style="width: {{ week.percentage }}%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="week-tasks-list">
+        {% for task in week.tasks %}
+        <div class="task-row {% if task.completed %}is-completed{% endif %}" data-task-id="{{ task.id }}">
+          <label class="custom-checkbox-wrap">
+            <input type="checkbox" class="task-checkbox" 
+                   {% if task.completed %}checked{% endif %} 
+                   onchange="toggleMilestone('{{ task.id }}', this)">
+            <span class="checkbox-custom"></span>
+          </label>
+
+          <div class="task-body">
+            <div class="task-meta-line">
+              <span class="task-day">{{ task.day }}</span>
+              <span class="task-tag">{{ task.tag }}</span>
+            </div>
+            <h3 class="task-title">{{ task.title }}</h3>
+            <p class="task-desc">{{ task.desc }}</p>
+            
+            {% if task.tip %}
+            <div class="task-tip-box">
+              <span class="tip-icon">💡</span>
+              <span class="tip-text"><b>Placement Tip:</b> {{ task.tip }}</span>
+            </div>
+            {% endif %}
+            
+            {% if task.link and task.link != '#' %}
+            <div class="task-footer-links">
+              <a href="{{ task.link }}" target="_blank" rel="noopener" class="study-link">Practice resource ↗</a>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="roadmap-footer-cta">
+    <div>
+      <h3>Ready to put your preparation to the test?</h3>
+      <p>Simulate campus readiness scoring or jump right into targeted role applications.</p>
+    </div>
+    <div class="footer-cta-buttons">
+      <a href="{{ url_for('assessment') }}" class="outline-btn">Assessment</a>
+      <a href="{{ url_for('jobs') }}" class="solid-btn">View Job Pipeline →</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

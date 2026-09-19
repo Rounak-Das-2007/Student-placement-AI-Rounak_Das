@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — PlacementAI{% endblock %}
+{% block content %}
+<section class="app-page">
+  <div class="page-head">
+    <div>
+      <span class="eyebrow">STUDENT DASHBOARD</span>
+      <h1>Hey {{ logged_user['name'].split()[0] }}, let's get you placement-ready.</h1>
+      <p>Your holistic preparation snapshot, pipeline status, and next best actions.</p>
+    </div>
+    <div class="head-cta-group">
+      <a class="outline-btn" href="{{ url_for('jobs') }}">Application Pipeline →</a>
+      <a class="solid-btn" href="{{ url_for('assessment') }}">Update assessment →</a>
+    </div>
+  </div>
+
+  <div class="dashboard-cards">
+    <!-- Stat 1: Readiness Model Score -->
+    <div class="dash-stat main-stat">
+      <div class="stat-top">
+        <span>Placement readiness</span>
+        <span class="status-pill">● {{ "On Track" if data.score >= 70 else "Needs Work" }}</span>
+      </div>
+      <div class="dashboard-score">{{ data.score }}<small>/100</small></div>
+      <div class="meter"><div style="width:{{ data.score }}%"></div></div>
+      <p>{{ "Strong profile. Keep practicing interview questions and applying to target roles." if data.score >= 70 else "Complete your placement assessment and focus on priority skills." }}</p>
+    </div>
+
+    <!-- Stat 2: Dynamic 30-Day Roadmap Progress -->
+    <div class="dash-stat">
+      <div class="stat-top">
+        <span>30-Day Roadmap</span>
+        <span class="badge-tag purple-tag">{{ data.roadmap.percentage }}% Done</span>
+      </div>
+      <strong class="stat-strong">{{ data.roadmap.completed_count }}<small class="slash-total">/{{ data.roadmap.total_tasks }}</small></strong>
+      <small>Milestones completed</small>
+      <div class="meter mini-meter" style="margin-top: 10px;">
+        <div style="width:{{ data.roadmap.percentage }}%"></div>
+      </div>
+      <a href="{{ url_for('roadmap') }}">Open checklist →</a>
+    </div>
+
+    <!-- Stat 3: Application Pipeline Summary -->
+    <div class="dash-stat">
+      <div class="stat-top">
+        <span>Job Pipeline</span>
+        <span class="badge-tag green-tag">{{ data.pipeline_counts.Offered }} Offers</span>
+      </div>
+      <strong class="stat-strong">{{ data.applications|length }}</strong>
+      <small>{{ data.pipeline_counts.Applied }} applied · {{ data.pipeline_counts.Interviewing }} interviewing</small>
+      <div class="pipeline-mini-dots">
+        <span title="Wishlist: {{ data.pipeline_counts.Saved }}" class="dot-count blue-bg">{{ data.pipeline_counts.Saved }} Saved</span>
+        <span title="Applied: {{ data.pipeline_counts.Applied }}" class="dot-count purple-bg">{{ data.pipeline_counts.Applied }} Applied</span>
+        <span title="Interviews: {{ data.pipeline_counts.Interviewing }}" class="dot-count orange-bg">{{ data.pipeline_counts.Interviewing }} Intv</span>
+      </div>
+      <a href="{{ url_for('jobs') }}">Open Kanban board →</a>
+    </div>
+  </div>
+
+  <div class="dashboard-layout">
+    <!-- AI Coach Section -->
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <span class="muted">AI COACH</span>
+          <h2>Today's priorities</h2>
+        </div>
+        <span class="spark">✦</span>
+      </div>
+      {% for item in data.recommendations %}
+      <div class="coach-row">
+        <span class="coach-icon">{{ loop.index }}</span>
+        <div>
+          <b>{{ item[0] }}</b>
+          <p>{{ item[2] }}</p>
+        </div>
+        <span class="coach-score">{{ item[1]|round|int }}%</span>
+      </div>
+      {% endfor %}
+      
+      <!-- Quick Roadmap Spotlight -->
+      <div class="dash-spotlight">
+        <div class="spotlight-text">
+          <b>Next Roadmap Action:</b>
+          <p>Complete this week's technical coding and STAR interview questions.</p>
+        </div>
+        <a href="{{ url_for('roadmap') }}" class="outline-btn small">Continue Roadmap</a>
+      </div>
+    </div>
+
+    <!-- Toolkit & Quick Actions -->
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <span class="muted">PLACEMENT STACK</span>
+          <h2>Your toolkit</h2>
+        </div>
+      </div>
+      <a class="tool-row" href="{{ url_for('jobs') }}">
+        <span class="tool-icon orange-bg">📋</span>
+        <div>
+          <b>Job Application Pipeline</b>
+          <small>Manage Kanban stages & track offers</small>
+        </div>
+        <span>→</span>
+      </a>
+      <a class="tool-row" href="{{ url_for('roadmap') }}">
+        <span class="tool-icon purple-bg">◇</span>
+        <div>
+          <b>30-Day Placement Roadmap</b>
+          <small>{{ data.roadmap.completed_count }}/{{ data.roadmap.total_tasks }} milestones done</small>
+        </div>
+        <span>→</span>
+      </a>
+      <a class="tool-row" href="{{ url_for('resume') }}">
+        <span class="tool-icon blue">▤</span>
+        <div>
+          <b>Resume AI</b>
+          <small>Improve keyword & ATS readiness</small>
+        </div>
+        <span>→</span>
+      </a>
+      <a class="tool-row" href="{{ url_for('interview') }}">
+        <span class="tool-icon green">◉</span>
+        <div>
+          <b>Mock Interview</b>
+          <small>Practice HR & Technical questions</small>
+        </div>
+        <span>→</span>
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

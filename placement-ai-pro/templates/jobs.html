@@ -1,0 +1,341 @@
+{% extends "base.html" %}
+{% block title %}Job Tracker & Pipeline — PlacementAI{% endblock %}
+{% block content %}
+<section class="app-page">
+  <div class="page-head">
+    <div>
+      <span class="eyebrow">CAREER PIPELINE & ROLES</span>
+      <h1>Track applications and target roles.</h1>
+      <p>Organize your campus and off-campus recruitment drive from first application to final offer letter.</p>
+    </div>
+    <div class="head-cta-group">
+      <button class="solid-btn" id="openAddJobModalBtn" onclick="openAddJobModal('Applied')">+ Add Custom Application</button>
+    </div>
+  </div>
+
+  <!-- Pipeline KPI Stats -->
+  <div class="pipeline-kpi-bar">
+    <div class="kpi-card">
+      <span class="kpi-label">TOTAL TRACKED</span>
+      <div class="kpi-val">{{ counts.total }}</div>
+      <span class="kpi-sub">Campus & off-campus</span>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-label">WISHLIST / SAVED</span>
+      <div class="kpi-val blue-text">{{ counts.Saved }}</div>
+      <span class="kpi-sub">Ready to apply</span>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-label">APPLIED / IN REVIEW</span>
+      <div class="kpi-val purple-text">{{ counts.Applied }}</div>
+      <span class="kpi-sub">Awaiting OA / Shortlist</span>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-label">INTERVIEWING</span>
+      <div class="kpi-val orange-text">{{ counts.Interviewing }}</div>
+      <span class="kpi-sub">Active interview rounds</span>
+    </div>
+    <div class="kpi-card highlight-kpi">
+      <span class="kpi-label">OFFERS RECEIVED</span>
+      <div class="kpi-val green-text">🏆 {{ counts.Offered }}</div>
+      <span class="kpi-sub">Milestone achieved</span>
+    </div>
+  </div>
+
+  <!-- Tab Selector -->
+  <div class="pipeline-tabs-nav">
+    <div class="tab-btn-group">
+      <button class="tab-link active" id="tabBtnPipeline" onclick="switchJobTab('pipeline')">
+        Application Pipeline (Kanban) <span class="tab-count-pill">{{ counts.total }}</span>
+      </button>
+      <button class="tab-link" id="tabBtnExplore" onclick="switchJobTab('explore')">
+        Explore Campus Roles <span class="tab-count-pill">{{ jobs|length }}</span>
+      </button>
+    </div>
+    <div id="searchWrapExplore" class="search-box" style="display: none;">
+      ⌕ <input id="jobSearch" placeholder="Search company, role or skill...">
+    </div>
+  </div>
+
+  <!-- VIEW 1: KANBAN APPLICATION PIPELINE -->
+  <div id="viewPipeline" class="job-tab-content active">
+    <div class="kanban-board">
+      
+      <!-- COLUMN 1: SAVED / WISHLIST -->
+      <div class="kanban-col" data-stage="Saved">
+        <div class="kanban-col-head col-saved">
+          <div class="col-title-wrap">
+            <span class="stage-dot dot-saved">●</span>
+            <h3>Wishlist</h3>
+          </div>
+          <span class="kanban-badge">{{ pipeline.Saved|length }}</span>
+        </div>
+        <div class="kanban-card-list" id="list-Saved">
+          {% for app in pipeline.Saved %}
+          <div class="kanban-card" data-app-id="{{ app.id }}">
+            <div class="card-head">
+              <span class="card-company">{{ app.company }}</span>
+              <button class="card-delete-btn" onclick="deleteApp({{ app.id }}, this)" title="Remove">×</button>
+            </div>
+            <h4 class="card-role">{{ app.role }}</h4>
+            {% if app.salary %}
+            <span class="card-salary-tag">{{ app.salary }}</span>
+            {% endif %}
+            {% if app.notes %}
+            <p class="card-notes">{{ app.notes }}</p>
+            {% endif %}
+            <div class="card-meta">
+              <span class="card-date">{{ app.created_at[:10] }}</span>
+              <div class="stage-actions">
+                <select class="stage-dropdown" onchange="changeAppStage({{ app.id }}, this.value, this)">
+                  <option value="Saved" selected>Wishlist</option>
+                  <option value="Applied">→ Applied</option>
+                  <option value="Interviewing">→ Interview</option>
+                  <option value="Offered">→ Offer</option>
+                  <option value="Rejected">→ Rejected</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          {% else %}
+          <div class="kanban-empty">
+            <p>No roles in wishlist.</p>
+            <button class="text-btn small" onclick="switchJobTab('explore')">+ Browse roles</button>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- COLUMN 2: APPLIED -->
+      <div class="kanban-col" data-stage="Applied">
+        <div class="kanban-col-head col-applied">
+          <div class="col-title-wrap">
+            <span class="stage-dot dot-applied">●</span>
+            <h3>Applied</h3>
+          </div>
+          <span class="kanban-badge">{{ pipeline.Applied|length }}</span>
+        </div>
+        <div class="kanban-card-list" id="list-Applied">
+          {% for app in pipeline.Applied %}
+          <div class="kanban-card" data-app-id="{{ app.id }}">
+            <div class="card-head">
+              <span class="card-company">{{ app.company }}</span>
+              <button class="card-delete-btn" onclick="deleteApp({{ app.id }}, this)" title="Remove">×</button>
+            </div>
+            <h4 class="card-role">{{ app.role }}</h4>
+            {% if app.salary %}
+            <span class="card-salary-tag">{{ app.salary }}</span>
+            {% endif %}
+            {% if app.notes %}
+            <p class="card-notes">{{ app.notes }}</p>
+            {% endif %}
+            <div class="card-meta">
+              <span class="card-date">{{ app.created_at[:10] }}</span>
+              <div class="stage-actions">
+                <select class="stage-dropdown" onchange="changeAppStage({{ app.id }}, this.value, this)">
+                  <option value="Saved">← Wishlist</option>
+                  <option value="Applied" selected>Applied</option>
+                  <option value="Interviewing">→ Interview</option>
+                  <option value="Offered">→ Offer</option>
+                  <option value="Rejected">→ Rejected</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          {% else %}
+          <div class="kanban-empty">
+            <p>No active applications.</p>
+            <button class="text-btn small" onclick="openAddJobModal('Applied')">+ Log application</button>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- COLUMN 3: INTERVIEWING -->
+      <div class="kanban-col" data-stage="Interviewing">
+        <div class="kanban-col-head col-interviewing">
+          <div class="col-title-wrap">
+            <span class="stage-dot dot-interviewing">●</span>
+            <h3>Interviewing</h3>
+          </div>
+          <span class="kanban-badge">{{ pipeline.Interviewing|length }}</span>
+        </div>
+        <div class="kanban-card-list" id="list-Interviewing">
+          {% for app in pipeline.Interviewing %}
+          <div class="kanban-card" data-app-id="{{ app.id }}">
+            <div class="card-head">
+              <span class="card-company">{{ app.company }}</span>
+              <button class="card-delete-btn" onclick="deleteApp({{ app.id }}, this)" title="Remove">×</button>
+            </div>
+            <h4 class="card-role">{{ app.role }}</h4>
+            {% if app.salary %}
+            <span class="card-salary-tag">{{ app.salary }}</span>
+            {% endif %}
+            {% if app.notes %}
+            <p class="card-notes">{{ app.notes }}</p>
+            {% endif %}
+            <div class="card-meta">
+              <span class="card-date">{{ app.created_at[:10] }}</span>
+              <div class="stage-actions">
+                <select class="stage-dropdown" onchange="changeAppStage({{ app.id }}, this.value, this)">
+                  <option value="Saved">← Wishlist</option>
+                  <option value="Applied">← Applied</option>
+                  <option value="Interviewing" selected>Interviewing</option>
+                  <option value="Offered">→ Offer 🏆</option>
+                  <option value="Rejected">→ Rejected</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          {% else %}
+          <div class="kanban-empty">
+            <p>No interviews scheduled yet.</p>
+            <button class="text-btn small" onclick="openAddJobModal('Interviewing')">+ Add interview</button>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- COLUMN 4: OFFER RECEIVED -->
+      <div class="kanban-col" data-stage="Offered">
+        <div class="kanban-col-head col-offered">
+          <div class="col-title-wrap">
+            <span class="stage-dot dot-offered">●</span>
+            <h3>Offer Received</h3>
+          </div>
+          <span class="kanban-badge">{{ pipeline.Offered|length }}</span>
+        </div>
+        <div class="kanban-card-list" id="list-Offered">
+          {% for app in pipeline.Offered %}
+          <div class="kanban-card card-offer-celebrate" data-app-id="{{ app.id }}">
+            <div class="card-head">
+              <span class="card-company">{{ app.company }}</span>
+              <button class="card-delete-btn" onclick="deleteApp({{ app.id }}, this)" title="Remove">×</button>
+            </div>
+            <h4 class="card-role">{{ app.role }}</h4>
+            {% if app.salary %}
+            <span class="card-salary-tag offer-tag">🎉 {{ app.salary }}</span>
+            {% endif %}
+            {% if app.notes %}
+            <p class="card-notes">{{ app.notes }}</p>
+            {% endif %}
+            <div class="card-meta">
+              <span class="card-date">{{ app.created_at[:10] }}</span>
+              <div class="stage-actions">
+                <select class="stage-dropdown" onchange="changeAppStage({{ app.id }}, this.value, this)">
+                  <option value="Saved">← Wishlist</option>
+                  <option value="Applied">← Applied</option>
+                  <option value="Interviewing">← Interview</option>
+                  <option value="Offered" selected>Offer Received</option>
+                  <option value="Rejected">→ Archived</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          {% else %}
+          <div class="kanban-empty">
+            <p>Your job offers will celebrate here!</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Collapsible Rejected / Archived Section -->
+    {% if pipeline.Rejected %}
+    <details class="archived-section">
+      <summary class="archived-summary">Archived / Closed Roles ({{ pipeline.Rejected|length }})</summary>
+      <div class="archived-grid">
+        {% for app in pipeline.Rejected %}
+        <div class="kanban-card archived-card" data-app-id="{{ app.id }}">
+          <div class="card-head">
+            <span class="card-company">{{ app.company }}</span>
+            <button class="card-delete-btn" onclick="deleteApp({{ app.id }}, this)" title="Remove">×</button>
+          </div>
+          <h4 class="card-role">{{ app.role }}</h4>
+          <span class="card-date">{{ app.created_at[:10] }}</span>
+          <button class="text-btn small" onclick="changeAppStage({{ app.id }}, 'Applied', this)">Restore to Applied</button>
+        </div>
+        {% endfor %}
+      </div>
+    </details>
+    {% endif %}
+  </div>
+
+  <!-- VIEW 2: EXPLORE CAMPUS ROLES -->
+  <div id="viewExplore" class="job-tab-content" style="display:none;">
+    <div class="job-grid">
+      {% for job in jobs %}
+      <div class="job-card" data-search="{{ job[0] }} {{ job[1] }} {{ job[2] }}">
+        <div class="job-head">
+          <div class="company-logo">{{ job[0][0] }}</div>
+          <span class="match">{{ job[4] }}% match</span>
+        </div>
+        <span class="muted">{{ job[0] }}</span>
+        <h2>{{ job[1] }}</h2>
+        <p>{{ job[2] }}</p>
+        <div class="job-bottom">
+          <b>{{ job[3] }}</b>
+          <div class="explore-actions">
+            <button class="outline-btn small save-job" data-company="{{ job[0] }}" data-role="{{ job[1] }}" data-salary="{{ job[3] }}" data-stage="Saved">
+              Wishlist
+            </button>
+            <button class="solid-btn small save-job" data-company="{{ job[0] }}" data-role="{{ job[1] }}" data-salary="{{ job[3] }}" data-stage="Applied">
+              Apply & Track
+            </button>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+</section>
+
+<!-- MODAL: ADD CUSTOM APPLICATION -->
+<div id="addJobModal" class="modal-backdrop" style="display: none;">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div>
+        <span class="eyebrow">CUSTOM ROLE</span>
+        <h3>Track New Application</h3>
+      </div>
+      <button class="modal-close-btn" onclick="closeAddJobModal()">×</button>
+    </div>
+    <form id="addJobForm" onsubmit="submitCustomJob(event)">
+      <div class="form-group">
+        <label>Company Name *</label>
+        <input type="text" id="modalCompany" placeholder="e.g. Google, Microsoft, Atlassian, Startup" required>
+      </div>
+      <div class="form-group">
+        <label>Role / Designation *</label>
+        <input type="text" id="modalRole" placeholder="e.g. Associate Software Engineer, SDE-1" required>
+      </div>
+      <div class="form-row-2">
+        <div class="form-group">
+          <label>Package / CTC</label>
+          <input type="text" id="modalSalary" placeholder="e.g. 8-12 LPA">
+        </div>
+        <div class="form-group">
+          <label>Initial Stage</label>
+          <select id="modalStatus">
+            <option value="Saved">Wishlist / Target</option>
+            <option value="Applied" selected>Applied</option>
+            <option value="Interviewing">Interview Scheduled</option>
+            <option value="Offered">Offer Received</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Notes / Interview Rounds / Referral</label>
+        <textarea id="modalNotes" rows="3" placeholder="e.g. Round 1 on Thursday: DSA and System Design basics. Referred by senior alumni."></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="outline-btn" onclick="closeAddJobModal()">Cancel</button>
+        <button type="submit" class="solid-btn">Add to Pipeline</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
